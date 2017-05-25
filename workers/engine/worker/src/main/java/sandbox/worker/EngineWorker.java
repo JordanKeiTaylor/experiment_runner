@@ -93,11 +93,10 @@ public class EngineWorker {
 
         ConnectionParameters parameters = new ConnectionParameters();
         parameters.workerType = argsMap.get("+workerType");
-        parameters.workerId = argsMap.get("+workerId");
         parameters.networkParameters.type = NetworkConnectionType.RakNet;
         parameters.networkParameters.useExternalIp = false;
 
-        connection = Connection.connectAsync(hostname, port, parameters).get();
+        connection = Connection.connectAsync(hostname, port, argsMap.get("+workerId"), parameters).get();
 
         if (!connection.isConnected()) {
             logger.warn("Failed to connect");

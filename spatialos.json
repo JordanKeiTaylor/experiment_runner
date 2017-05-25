@@ -1,11 +1,11 @@
 {
     "name": "sandbox",
     "project_version": "0.0.1",
-    "sdk_version": "10.3.0",
+    "sdk_version": "11.0.0-experimental-01",
     "dependencies": [
       {
         "name": "WorkerSdkSchema",
-        "version": "10.3.0"
+        "version": "11.0.0-experimental-01"
       }
     ]
 }
