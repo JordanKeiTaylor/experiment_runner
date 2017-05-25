@@ -111,10 +111,10 @@ public class EngineWorker {
         dispatcher.onDisconnect(disconnect -> System.exit(0));
         dispatcher.onMetrics(EngineWorker::sendMetricsUpdate);
 
-        dispatcher.onAuthorityChange(Particle.class, EngineWorker::authorityChange);
-        dispatcher.onAddComponent(Particle.class, EngineWorker::addParticle);
-        dispatcher.onComponentUpdate(Particle.class, EngineWorker::updateParticle);
-        dispatcher.onRemoveComponent(Particle.class, EngineWorker::removeParticle);
+        dispatcher.onAuthorityChange(Position.class, EngineWorker::authorityChange);
+        dispatcher.onAddComponent(Position.class, EngineWorker::addParticle);
+        dispatcher.onComponentUpdate(Position.class, EngineWorker::updateParticle);
+        dispatcher.onRemoveComponent(Position.class, EngineWorker::removeParticle);
 
         return dispatcher;
     }
@@ -122,10 +122,10 @@ public class EngineWorker {
     private static void authorityChange(AuthorityChange op) {
     }
 
-    private static void addParticle(AddComponent<ParticleData, Particle> op) {
+    private static void addParticle(AddComponent<PositionData, Position> op) {
     }
 
-    private static void updateParticle(Ops.ComponentUpdate<Particle.Update> op) {
+    private static void updateParticle(Ops.ComponentUpdate<Position.Update> op) {
     }
 
     private static void removeParticle(RemoveComponent op) {

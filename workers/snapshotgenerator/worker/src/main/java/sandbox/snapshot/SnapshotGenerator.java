@@ -5,8 +5,11 @@ import improbable.math.Coordinates;
 import improbable.math.Vector3f;
 import improbable.worker.Snapshot;
 import sandbox.snapshot.SnapshotBuilder;
+import java.util.Random;
 
 public class SnapshotGenerator {
+    static Random random = new Random();
+    static SnapshotBuilder snapshot = new SnapshotBuilder();
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -19,9 +22,7 @@ public class SnapshotGenerator {
 
 
     static void buildSnapshot(String output) {
-        SnapshotBuilder snapshot = new SnapshotBuilder();
-
-        snapshot.createParticle( new Coordinates(0.0f, 0.0f, 0.0f), new Vector3f(-1.4f,0.0f,1.1f) );
+        generateCluster(null, 200, 8, 4);
 
         Option<String> errorOpt = Snapshot.save(output, snapshot);
         if (errorOpt.isPresent()) {
@@ -31,4 +32,26 @@ public class SnapshotGenerator {
         }
     }
 
+    static Coordinates randomCoordinates(double spread) {
+        return new Coordinates(random.nextGaussian() * spread, random.nextGaussian() * spread, random.nextGaussian() * spread);
+    }
+
+    static Coordinates addCoordinates(Coordinates coord1, Coordinates coord2) {
+        return new Coordinates(coord1.getX() + coord2.getX(), coord1.getY() + coord2.getY(), coord1.getZ() + coord2.getZ());
+    }
+
+    static void generateCluster(Coordinates center, double spread, int numberOfEntities, int depth) {
+        if (depth <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < numberOfEntities; i++) {
+            //create entitity
+            Coordinates position = (center == null) ? randomCoordinates(spread) : addCoordinates(randomCoordinates(spread), center);
+            snapshot.createSubscriber(position);;
+
+            //create new cluster around entity
+            generateCluster(position, spread /=1.3, numberOfEntities, depth-1);
+        }
+    }
 }

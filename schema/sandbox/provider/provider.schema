@@ -1,0 +1,7 @@
+package provider;
+
+component Provider {
+    id = 102;
+
+    uint32 placeholder = 1;
+}

@@ -17,8 +17,8 @@
         }
       ],
       "dimensions": {
-          "x_meters": 500,
-          "z_meters": 500
+          "x_meters": 2000,
+          "z_meters": 2000
       },
       "snapshots": {
         "snapshotWritePeriodSeconds": 0
