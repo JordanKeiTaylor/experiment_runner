@@ -1,0 +1,12 @@
+package sandbox;
+
+component Particle {
+    // Schema file ID, unique within the project
+    id = 100;
+
+    // Particle's current position (also entitiy position)
+    EntityPosition position = 1;
+
+    // Particle's current velocity
+    Vector3f velocity = 2;
+}

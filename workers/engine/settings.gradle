@@ -1,0 +1,5 @@
+include ':worker-sdk'
+include ':worker'
+
+rootProject.name = "Engine"
+gradle.ext.mainClass = 'sandbox.worker.Engine'

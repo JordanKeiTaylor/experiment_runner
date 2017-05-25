@@ -1,0 +1,93 @@
+{
+  "build": {
+    "tasks_filename": "spatialos.java.build.json",
+    "generated_build_scripts_type": "java"
+  },
+  "bridge": {
+    "worker_attribute_set": {
+        "attributes": [
+            "engine"
+        ]
+    },
+    "entity_interest": {
+      "range_entity_interest": {
+        "radius": 100
+      }
+    },
+    "streaming_query": [],
+    "component_delivery": {
+      "default": "RELIABLE_ORDERED",
+      "checkout_all_initially": true
+    }
+  },
+  "managed": {
+    "windows": {
+      "artifact_name": "Engine@Windows.zip",
+      "command": "java",
+      "arguments": [
+        "-jar",
+        "Engine.jar",
+        "+appName=${IMPROBABLE_PROJECT_NAME}",
+        "+receptionistIp=${IMPROBABLE_RECEPTIONIST_IP}",
+        "+receptionistPort=${IMPROBABLE_RECEPTIONIST_PORT}",
+        "+workerType=${IMPROBABLE_WORKER_NAME}",
+        "+workerId=${IMPROBABLE_WORKER_ID}"
+      ]
+    },
+    "linux": {
+      "artifact_name": "Engine@Linux.zip",
+      "command": "java",
+      "arguments": [
+        "-jar",
+        "Engine.jar",
+        "+appName=${IMPROBABLE_PROJECT_NAME}",
+        "+receptionistIp=${IMPROBABLE_RECEPTIONIST_IP}",
+        "+receptionistPort=${IMPROBABLE_RECEPTIONIST_PORT}",
+        "+workerType=${IMPROBABLE_WORKER_NAME}",
+        "+workerId=${IMPROBABLE_WORKER_ID}"
+      ]
+    },
+    "macos": {
+      "artifact_name": "Engine@Mac.zip",
+      "command": "java",
+      "arguments": [
+        "-jar",
+        "Engine.jar",
+        "+appName=${IMPROBABLE_PROJECT_NAME}",
+        "+receptionistIp=${IMPROBABLE_RECEPTIONIST_IP}",
+        "+receptionistPort=${IMPROBABLE_RECEPTIONIST_PORT}",
+        "+workerType=${IMPROBABLE_WORKER_NAME}",
+        "+workerId=${IMPROBABLE_WORKER_ID}"
+      ]
+    }
+  },
+  "external": {
+    "default": {
+      "run_type": "EXECUTABLE_ZIP",
+      "windows": {
+        "artifact_name": "Engine@Windows.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "Engine.jar"
+        ]
+      },
+      "linux": {
+        "artifact_name": "Engine@Linux.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "Engine.jar"
+        ]
+      },
+      "macos": {
+        "artifact_name": "Engine@Mac.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "Engine.jar"
+        ]
+      }
+    }
+  }
+}
