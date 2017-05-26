@@ -1,0 +1,7 @@
+package subscriber;
+
+component Connection {
+    id = 101;
+
+    uint32 strength = 1;
+}

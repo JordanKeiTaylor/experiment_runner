@@ -1,7 +1,0 @@
-package subscriber;
-
-component Subscriber {
-    id = 101;
-
-    uint32 utility = 1;
-}

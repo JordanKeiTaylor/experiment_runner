@@ -24,6 +24,8 @@ public class SnapshotGenerator {
     static void buildSnapshot(String output) {
         generateCluster(null, 200, 8, 4);
 
+        snapshot.createProvider(new Coordinates(0.0f,0.0f,0.0f));
+
         Option<String> errorOpt = Snapshot.save(output, snapshot);
         if (errorOpt.isPresent()) {
             throw new RuntimeException("Error saving snapshot: " + errorOpt.get());

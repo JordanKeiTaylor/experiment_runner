@@ -36,8 +36,8 @@
         ],
         "load_balancing": {
           "static_hex_grid": {
-            "worker_radius_meters": 250.0,
-            "grid_width": 2,
+            "worker_radius_meters": 1000.0,
+            "grid_width": 1,
             "grid_height": 1
           }
         }
