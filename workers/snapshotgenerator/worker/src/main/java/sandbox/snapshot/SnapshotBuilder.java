@@ -9,8 +9,8 @@ import improbable.worker.SnapshotEntity;
 import sandbox.*;
 import subscriber.Connection;
 import subscriber.ConnectionData;
-import subscriber.Utility;
-import subscriber.UtilityData;
+import subscriber.Connection;
+import subscriber.ConnectionData;
 
 import java.util.HashMap;
 import java.util.LinkedList;
