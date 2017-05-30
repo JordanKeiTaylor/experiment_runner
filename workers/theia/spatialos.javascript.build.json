@@ -1,0 +1,82 @@
+{
+  "tasks": [
+    {
+      "name": "Codegen",
+      "steps": [
+        {
+          "name": "Dependencies",
+          "arguments": [
+            "worker_package",
+            "unpack"
+          ]
+        },
+        {
+          "name": "JavaScript",
+          "arguments": [
+            "process_schema",
+            "generate",
+            "--output=src/generated",
+            "--language=javascript",
+            "--protoc_path=./dependencies/protoc"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Build",
+      "steps": [
+        {
+          "name": "Codegen",
+          "arguments": [
+            "invoke-task",
+            "Codegen"
+          ]
+        },
+        {
+          "name": "NPM Install",
+          "command": "npm",
+          "arguments": [
+            "install"
+          ]
+        },
+        {
+          "name": "NPM Build",
+          "command": "npm",
+          "arguments": [
+            "run",
+            "build"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clean",
+      "steps": [
+        {
+          "name": "Generated code",
+          "arguments": [
+            "process_schema",
+            "clean",
+            "src/generated"
+          ]
+        },
+        {
+          "name": "NPM Clean",
+          "arguments": [
+            "process_schema",
+            "clean",
+            "node_modules",
+            "build"
+          ]
+        },
+        {
+          "name": "Dependencies",
+          "arguments": [
+            "worker_package",
+            "clean"
+          ]
+        }
+      ]
+    }
+  ]
+}

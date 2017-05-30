@@ -8,7 +8,7 @@ target/
 *.spatialos/
 *.iml
 workers/../worker-sdk
-workers/../spatialos.java.build.json
+workers/../spatialos.*.build.json
 workers/../pom.xml
 .improbable
 output.snapshot
@@ -16,3 +16,7 @@ output.snapshot
 workers/*/gradle/
 workers/*/gradlew
 workers/*/gradlew.bat
+workers/*/node_modules
+workers/*/src/generated
+workers/*/dependencies
+spatialos_worker_packages.json
