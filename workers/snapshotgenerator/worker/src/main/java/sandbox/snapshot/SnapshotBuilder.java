@@ -20,6 +20,7 @@ import java.util.Map;
 public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
 
     private static final String ENGINE_ATTRIBUTE_NAME = "engine";
+    private static final String THEIA_ATTRIBUTE_NAME = "theia";
 
     private long nextId = 200;
 
@@ -29,6 +30,7 @@ public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
         SnapshotEntity entity = new SnapshotEntity("subscriber");
         entity.add(Position.class, new PositionData(position));
         entity.add(Connection.class, new ConnectionData(0));
+        entity.add(Visualise.class, new VisualiseData());
 
         int[] writeList = {
                 Position.COMPONENT_ID,
@@ -57,21 +59,31 @@ public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
         WorkerAttribute particleAtom = new WorkerAttribute(Option.of(attributeName));
         List<WorkerAttribute> particleAttributeList = new LinkedList<>();
         particleAttributeList.add(particleAtom);
-
         WorkerAttributeSet particleAttributeSet = new WorkerAttributeSet(particleAttributeList);
+
+        WorkerAttribute theia = new WorkerAttribute(Option.of(THEIA_ATTRIBUTE_NAME));
+        List<WorkerAttribute> theiaAttributeList = new LinkedList<>();
+        theiaAttributeList.add(theia);
+        WorkerAttributeSet theiaAttributeSet = new WorkerAttributeSet(theiaAttributeList);
 
         List<WorkerAttributeSet> attributeSets = new LinkedList<>();
         attributeSets.add(particleAttributeSet);
-
         WorkerRequirementSet writeRequirementSet = new WorkerRequirementSet(attributeSets);
+
+        List<WorkerAttributeSet> visualiseSets = new LinkedList<>();
+        visualiseSets.add(theiaAttributeSet);
+        WorkerRequirementSet visualiseRequirementSet = new WorkerRequirementSet(visualiseSets);
 
         List<WorkerAttributeSet> readAttributeSets = new LinkedList<>();
         readAttributeSets.add(particleAttributeSet);
+        readAttributeSets.add(theiaAttributeSet);
 
         Map<Integer, WorkerRequirementSet> writeRequirementSets = new HashMap<>();
         for (int componentId : writeList) {
             writeRequirementSets.put(componentId, writeRequirementSet);
         }
+
+        writeRequirementSets.put(Visualise.COMPONENT_ID, visualiseRequirementSet);
 
         ComponentAcl write = new ComponentAcl(writeRequirementSets);
         WorkerRequirementSet read = new WorkerRequirementSet(readAttributeSets);

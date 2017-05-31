@@ -1,0 +1,6 @@
+package sandbox;
+
+component Visualise {
+    // Schema file ID, unique within the project
+    id = 999;
+}

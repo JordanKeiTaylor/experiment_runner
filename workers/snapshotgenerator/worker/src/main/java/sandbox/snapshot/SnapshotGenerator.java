@@ -22,7 +22,7 @@ public class SnapshotGenerator {
 
 
     static void buildSnapshot(String output) {
-        generateCluster(null, 200, 8, 4);
+        generateCluster(null, 200, 2, 2);
 
         snapshot.createProvider(new Coordinates(0.0f,0.0f,0.0f));
 

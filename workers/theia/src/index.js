@@ -1,9 +1,14 @@
 const sdk = require("spatialos_worker_sdk");
 
 let position = require('./generated/sandbox/Position.js').Position;
+let visualise = require('./generated/sandbox/Visualise.js').Visualise;
+let connection = require('./generated/subscriber/Connection.js').Connection;
+let entityacl = require('./generated/improbable/EntityAcl.js').EntityAcl;
 
-console.log("position");
-console.log(position);
+let components = [
+    visualise,
+    position
+];
 
 let locatorParameters = new sdk.LocatorParameters();
 locatorParameters.projectName = "sandbox";
@@ -37,15 +42,23 @@ locator.getDeploymentList((err, deploymentList) => {
         console.log("---> Disconnected", op);
       });
 
-      console.log("======> registering position callback");
-      dispatcher.onAddComponent(position.COMPONENT, (id, data) => {
-        console.log("attempting add");
-        
-        window.entities[id] = {
-            id,
-            data,
-        };
+      dispatcher.onAddComponent(entityacl.COMPONENT, op => {});
+
+      components.forEach((component) => {
+        console.log("======> registering position callback" + component.COMPONENT.getComponentId());
+
+        dispatcher.onAddComponent(component.COMPONENT, op => {
+          console.log(op);
+          window.entities[op.entityId] = {
+            op,
+          }
+        });
       });
+
+      // dispatcher.onAddEntity(op => {
+      //       // Do something with op.entityId
+      //       console.log("ITS WORKING");
+      //   });
 
       connection.attachDispatcher(dispatcher);
     });
