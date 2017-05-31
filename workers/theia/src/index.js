@@ -48,23 +48,22 @@ locator.getDeploymentList((err, deploymentList) => {
         console.log("======> registering position callback" + component.COMPONENT.getComponentId());
 
         dispatcher.onAddComponent(component.COMPONENT, op => {
-          console.log(op);
           window.entities[op.entityId] = {
             op,
           }
         });
       });
 
-      // dispatcher.onAddEntity(op => {
-      //       // Do something with op.entityId
-      //       console.log("ITS WORKING");
-      //   });
-
       connection.attachDispatcher(dispatcher);
     });
 });
 
 document.addEventListener("DOMContentLoaded", function (event) {
-  // Code which depends on the HTML DOM content.
-  console.log("Hello World!");
+    setTimeout(() => {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.arc(95,50,40,0,2*Math.PI);
+        ctx.stroke();
+    }, 5000);
 });
