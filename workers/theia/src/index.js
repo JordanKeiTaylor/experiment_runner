@@ -6,7 +6,6 @@ let connection = require('./generated/subscriber/Connection.js').Connection;
 let entityacl = require('./generated/improbable/EntityAcl.js').EntityAcl;
 
 let components = [
-    visualise,
     position
 ];
 
@@ -23,6 +22,7 @@ const connectionParameters = new sdk.ConnectionParameters();
 connectionParameters.workerType = workerType;
 
 window.entities = {};
+window.positions = [];
 
 const locator = sdk.Locator.create(sdk.DefaultConfiguration.LOCAL_DEVELOPMENT_LOCATOR_URL, locatorParameters);
 locator.getDeploymentList((err, deploymentList) => {
@@ -51,19 +51,27 @@ locator.getDeploymentList((err, deploymentList) => {
           window.entities[op.entityId] = {
             op,
           }
+          window.positions.push(op)
         });
       });
 
       connection.attachDispatcher(dispatcher);
+
+      setTimeout(() => {
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            ctx.globalAlpha = 0.5;
+            
+            for (let id in window.entities) {
+                let position = window.entities[id].op.data.position;
+                ctx.beginPath();
+                ctx.arc(position.x + 500, position.y + 500, 5, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+        }, 5000);
     });
 });
 
 document.addEventListener("DOMContentLoaded", function (event) {
-    setTimeout(() => {
-        var canvas = document.getElementById("canvas");
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.arc(95,50,40,0,2*Math.PI);
-        ctx.stroke();
-    }, 5000);
+    
 });
