@@ -58,20 +58,32 @@ locator.getDeploymentList((err, deploymentList) => {
       connection.attachDispatcher(dispatcher);
 
       setTimeout(() => {
-            var canvas = document.getElementById("canvas");
-            var ctx = canvas.getContext("2d");
-            ctx.globalAlpha = 0.5;
-            
-            for (let id in window.entities) {
-                let position = window.entities[id].op.data.position;
-                ctx.beginPath();
-                ctx.arc(position.x + 500, position.y + 500, 5, 0, 2 * Math.PI);
-                ctx.stroke();
-            }
-        }, 5000);
+        renderPage();
+      }, 2000);
     });
 });
 
-document.addEventListener("DOMContentLoaded", function (event) {
+renderPage = () => {
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
     
-});
+    canvas.width = dimension[0];
+    canvas.height = dimension[1];
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#1C1F22";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    ctx.strokeStyle = "#FFF";
+    ctx.globalAlpha = 0.5;
+    for (let id in window.entities) {
+        let position = window.entities[id].op.data.position;
+        ctx.beginPath();
+        ctx.arc(position.x + 500, position.y + 500, 3, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+};
+
+renderPage();
