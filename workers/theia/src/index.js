@@ -24,6 +24,9 @@ connectionParameters.workerType = workerType;
 window.entities = {};
 window.positions = [];
 
+let canvas;
+let ctx;
+
 const locator = sdk.Locator.create(sdk.DefaultConfiguration.LOCAL_DEVELOPMENT_LOCATOR_URL, locatorParameters);
 locator.getDeploymentList((err, deploymentList) => {
   locator.connect("sandbox", connectionParameters, (err, queueStatus) => {
@@ -58,23 +61,13 @@ locator.getDeploymentList((err, deploymentList) => {
       connection.attachDispatcher(dispatcher);
 
       setTimeout(() => {
-        renderPage();
-      }, 2000);
+        render();
+      }, 5000);
     });
 });
 
-renderPage = () => {
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext("2d");
-
-    var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
-    
-    canvas.width = dimension[0];
-    canvas.height = dimension[1];
-
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#1C1F22";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+render = () => {
+    renderBackground();
 
     ctx.strokeStyle = "#FFF";
     ctx.globalAlpha = 0.5;
@@ -86,4 +79,36 @@ renderPage = () => {
     }
 };
 
-renderPage();
+initialisePage = () => {
+    canvas = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+
+    var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
+    
+    canvas.width = dimension[0];
+    canvas.height = dimension[1];
+
+    renderBackground();
+    renderLoading();
+};
+
+renderBackground = () => {
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#1C1F22";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+renderLoading = () => {
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#FFF";
+    ctx.font = 'lighter 20px sans-serif';
+    ctx.fillText("Connecting...", 50, 50);
+
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = "#FFF";
+    ctx.strokeRect(40, 60, 160, -35);
+}
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    initialisePage();
+});
