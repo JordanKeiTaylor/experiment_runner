@@ -26,6 +26,14 @@ window.positions = [];
 
 let canvas;
 let ctx;
+let canvasScale = {
+    x: 1,
+    y: 1
+}
+let canvasOffset = {
+    x: 500,
+    y: 500
+}
 
 const locator = sdk.Locator.create(sdk.DefaultConfiguration.LOCAL_DEVELOPMENT_LOCATOR_URL, locatorParameters);
 locator.getDeploymentList((err, deploymentList) => {
@@ -61,6 +69,7 @@ locator.getDeploymentList((err, deploymentList) => {
       connection.attachDispatcher(dispatcher);
 
       setTimeout(() => {
+        setScale();
         render();
       }, 5000);
     });
@@ -72,9 +81,13 @@ render = () => {
     ctx.strokeStyle = "#FFF";
     ctx.globalAlpha = 0.5;
     for (let id in window.entities) {
-        let position = window.entities[id].op.data.position;
+        let position = {
+            x: window.entities[id].op.data.position.x,
+            y: -window.entities[id].op.data.position.z,
+        }
+
         ctx.beginPath();
-        ctx.arc(position.x + 500, position.y + 500, 3, 0, 2 * Math.PI);
+        ctx.arc((position.x + canvasOffset.x) * canvasScale.x, (position.y + canvasOffset.y) * canvasScale.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
     }
 };
@@ -91,6 +104,34 @@ initialisePage = () => {
     renderBackground();
     renderLoading();
 };
+
+setScale = () => {
+    let min = {
+        x: 99999,
+        y: 99999,
+    }
+
+    let max = {
+        x: -99999,
+        y: -99999,
+    }
+
+    for (let id in window.entities) {
+        let position = window.entities[id].op.data.position;
+        min.x = (position.x < min.x) ? position.x : min.x;
+        min.y = (position.y < min.y) ? position.y : min.y;
+        max.x = (position.x > max.x) ? position.x : max.x;
+        max.y = (position.y > max.y) ? position.y : max.y; 
+    }
+
+    const bezel = 50; //px
+
+    canvasOffset.x = -min.x + bezel;
+    canvasOffset.y = -min.y + bezel;
+
+    canvasScale.x = (ctx.canvas.width - (bezel*2)) / (max.x - min.x);
+    canvasScale.y = (ctx.canvas.height - (bezel*2)) / (max.y - min.y);
+}
 
 renderBackground = () => {
     ctx.globalAlpha = 1;
