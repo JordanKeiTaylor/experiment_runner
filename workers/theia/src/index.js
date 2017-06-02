@@ -29,6 +29,8 @@ window.positions = [];
 
 let canvas;
 let ctx;
+
+const FIX_PERSPECTIVE = true;
 let canvasScale = {
     x: 1,
     y: 1
@@ -169,6 +171,12 @@ setScale = () => {
 
     canvasScale.x = (ctx.canvas.width - (bezel*2)) / (max.x - min.x);
     canvasScale.y = (ctx.canvas.height - (bezel*2)) / (max.y - min.y);
+
+    if (FIX_PERSPECTIVE) {
+        let minScaleFactor = Math.min(canvasScale.x, canvasScale.y);    
+        canvasScale.x = minScaleFactor;
+        canvasScale.y = minScaleFactor;
+    }
 
     console.log(canvasScale.x, canvasScale.y)
     console.log(canvasOffset.x, canvasOffset.y)
