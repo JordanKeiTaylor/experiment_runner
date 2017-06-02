@@ -2,7 +2,6 @@ const sdk = require("spatialos_worker_sdk");
 
 let position = require('./generated/sandbox/Position.js').Position;
 let visualise = require('./generated/sandbox/Visualise.js').Visualise;
-let connection = require('./generated/subscriber/Connection.js').Connection;
 let entityacl = require('./generated/improbable/EntityAcl.js').EntityAcl;
 
 let components = [
@@ -15,7 +14,6 @@ locatorParameters.credentialsType = sdk.LocatorCredentialsType.LOGIN_TOKEN;
 locatorParameters.loginToken = {
   token: sdk.DefaultConfiguration.LOCAL_DEVELOPMENT_LOGIN_TOKEN
 };
-
 
 let workerType = "theia";
 const connectionParameters = new sdk.ConnectionParameters();
@@ -60,7 +58,10 @@ locator.getDeploymentList((err, deploymentList) => {
 
         dispatcher.onAddComponent(component.COMPONENT, op => {
           window.entities[op.entityId] = {
-            op,
+            position: {
+                x: op.data.position.x,
+                y: -op.data.position.z,
+            }
           }
           window.positions.push(op)
         });
@@ -77,20 +78,30 @@ locator.getDeploymentList((err, deploymentList) => {
 
 render = () => {
     renderBackground();
+    renderAllEntities(window.entities);
+};
 
+renderAllEntities = (entities) => {
+    for (let id in entities) {
+        renderSingleEntity(entities[id])
+    }
+}
+
+renderSingleEntity = (entity) => {
     ctx.strokeStyle = "#FFF";
     ctx.globalAlpha = 0.5;
-    for (let id in window.entities) {
-        let position = {
-            x: window.entities[id].op.data.position.x,
-            y: -window.entities[id].op.data.position.z,
-        }
 
-        ctx.beginPath();
-        ctx.arc((position.x + canvasOffset.x) * canvasScale.x, (position.y + canvasOffset.y) * canvasScale.y, 3, 0, 2 * Math.PI);
-        ctx.stroke();
+    let position = {
+        x: entity.position.x,
+        y: entity.position.y,
     }
-};
+
+    console.log(position);
+
+    ctx.beginPath();
+    ctx.arc((position.x + canvasOffset.x) * canvasScale.x, (position.y + canvasOffset.y) * canvasScale.y, 3, 0, 2 * Math.PI);
+    ctx.stroke();
+}
 
 initialisePage = () => {
     canvas = document.getElementById("canvas");
@@ -117,7 +128,7 @@ setScale = () => {
     }
 
     for (let id in window.entities) {
-        let position = window.entities[id].op.data.position;
+        let position = window.entities[id].position;
         min.x = (position.x < min.x) ? position.x : min.x;
         min.y = (position.y < min.y) ? position.y : min.y;
         max.x = (position.x > max.x) ? position.x : max.x;
@@ -131,6 +142,9 @@ setScale = () => {
 
     canvasScale.x = (ctx.canvas.width - (bezel*2)) / (max.x - min.x);
     canvasScale.y = (ctx.canvas.height - (bezel*2)) / (max.y - min.y);
+
+    console.log(canvasScale.x, canvasScale.y)
+    console.log(canvasOffset.x, canvasOffset.y)
 }
 
 renderBackground = () => {
