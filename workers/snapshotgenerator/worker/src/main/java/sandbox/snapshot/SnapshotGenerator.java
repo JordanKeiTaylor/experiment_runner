@@ -4,22 +4,36 @@ import improbable.collections.Option;
 import improbable.math.Coordinates;
 import improbable.math.Vector3f;
 import improbable.worker.Snapshot;
+import sandbox.snapshot.GraphGenerator;
 import sandbox.snapshot.SnapshotBuilder;
 import java.util.Random;
 
 public class SnapshotGenerator {
     static Random random = new Random();
     static SnapshotBuilder snapshot = new SnapshotBuilder();
+    static GraphGenerator graphGenerator;
 
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Unexpected number of arguments. Usage: " +
                     "spatial local worker launch snapshotgenerator default path/to/my/snapshotfile.snapshot");
         } else {
-            buildSnapshot(args[0]);
+            buildGraphSnapshot(args[0]);
         }
     }
 
+    static void buildGraphSnapshot(String output) {
+        GraphGenerator.letsGo();
+
+        snapshot.createProvider(new Coordinates(0.0f,0.0f,0.0f));
+
+        Option<String> errorOpt = Snapshot.save(output, GraphGenerator.entities);
+        if (errorOpt.isPresent()) {
+            throw new RuntimeException("Error saving snapshot: " + errorOpt.get());
+        } else {
+            System.out.println("Wrote snapshot file to \"" + output + "\"  - wrote ("+GraphGenerator.entities.size()+" entities)");
+        }
+    }
 
     static void buildSnapshot(String output) {
         generateCluster(null, 200, 4, 4);

@@ -29,12 +29,10 @@ public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
 
         SnapshotEntity entity = new SnapshotEntity("subscriber");
         entity.add(Position.class, new PositionData(position));
-        entity.add(Connection.class, new ConnectionData(0));
         entity.add(Visualise.class, new VisualiseData());
 
         int[] writeList = {
-                Position.COMPONENT_ID,
-                Connection.COMPONENT_ID
+                Position.COMPONENT_ID
         };
 
         entity.add(EntityAcl.class, createAcl(ENGINE_ATTRIBUTE_NAME, writeList));

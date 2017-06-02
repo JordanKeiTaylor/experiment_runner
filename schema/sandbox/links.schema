@@ -1,0 +1,9 @@
+package sandbox;
+
+
+component Links {
+    // Schema file ID, unique within the project
+    id = 103;
+
+    list<EntityId> ids = 1;
+}
