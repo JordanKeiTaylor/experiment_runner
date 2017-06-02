@@ -4,8 +4,13 @@ let position = require('./generated/sandbox/Position.js').Position;
 let visualise = require('./generated/sandbox/Visualise.js').Visualise;
 let entityacl = require('./generated/improbable/EntityAcl.js').EntityAcl;
 
-let components = [
-    position
+let links = require('./generated/sandbox/Links.js').Links;
+
+let listenItems = [
+    {
+        key: 'links',
+        component: links
+    }
 ];
 
 let locatorParameters = new sdk.LocatorParameters();
@@ -53,17 +58,21 @@ locator.getDeploymentList((err, deploymentList) => {
 
       dispatcher.onAddComponent(entityacl.COMPONENT, op => {});
 
-      components.forEach((component) => {
-        console.log("======> registering position callback" + component.COMPONENT.getComponentId());
+      dispatcher.onAddComponent(position.COMPONENT, op => {
+        window.entities[op.entityId] = window.entities[op.entityId] || { id: op.entityId };
 
-        dispatcher.onAddComponent(component.COMPONENT, op => {
-          window.entities[op.entityId] = {
-            position: {
-                x: op.data.position.x,
-                y: -op.data.position.z,
-            }
-          }
-          window.positions.push(op)
+        window.entities[op.entityId].position = {
+            x: op.data.position.x,
+            y: -op.data.position.z,
+        }
+      });
+
+      listenItems.forEach((listenItem) => {
+        console.log("======> registering position callback" + listenItem.component.COMPONENT.getComponentId());
+
+        dispatcher.onAddComponent(listenItem.component.COMPONENT, op => {
+            window.entities[op.entityId] = window.entities[op.entityId] || { id: op.entityId };
+            window.entities[op.entityId][listenItem.key] = op.data;
         });
       });
 
@@ -88,18 +97,36 @@ renderAllEntities = (entities) => {
 }
 
 renderSingleEntity = (entity) => {
+    let position = entity.position;
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#FFF";
+    ctx.font = 'lighter 10px sans-serif';
+    ctx.fillText(entity.id, getWorldX(position.x) + 5, getWorldY(position.y));
+
     ctx.strokeStyle = "#FFF";
     ctx.globalAlpha = 0.5;
 
-    let position = {
-        x: entity.position.x,
-        y: entity.position.y,
-    }
-
-    console.log(position);
-
     ctx.beginPath();
-    ctx.arc((position.x + canvasOffset.x) * canvasScale.x, (position.y + canvasOffset.y) * canvasScale.y, 3, 0, 2 * Math.PI);
+    ctx.arc(getWorldX(position.x), getWorldY(position.y), 3, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    console.log(entity.id)
+
+    entity.links.ids.filter(id => id).forEach(targetId => 
+        drawEntityReference(entity, entities[targetId])
+    );
+}
+
+getWorldX = x => (x * canvasScale.x) + (canvasOffset.x * canvasScale.x);
+
+getWorldY = y => (y * canvasScale.y) + (canvasOffset.y * canvasScale.y);
+
+drawEntityReference = (entity1, entity2) => {
+    console.log("2) drawing to: " + entity2.id)
+    ctx.beginPath();
+    ctx.moveTo(getWorldX(entity1.position.x), getWorldY(entity1.position.y));
+    ctx.lineTo(getWorldX(entity2.position.x), getWorldY(entity2.position.y));
     ctx.stroke();
 }
 
@@ -135,7 +162,7 @@ setScale = () => {
         max.y = (position.y > max.y) ? position.y : max.y; 
     }
 
-    const bezel = 50; //px
+    const bezel = 0; //px
 
     canvasOffset.x = -min.x + bezel;
     canvasOffset.y = -min.y + bezel;
