@@ -1,0 +1,10 @@
+package sandbox;
+
+component Firefly {
+    // Schema file ID, unique within the project
+    id = 104;
+
+    float clock_time = 1;
+    float current_time = 2;
+    bool illuminated = 3;
+}

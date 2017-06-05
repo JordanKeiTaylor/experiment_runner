@@ -37,6 +37,8 @@ class GraphGenerator {
 
     static private long nextId = 2000;
 
+    static private Random random = new Random();
+
     public static void letsGo() {
         if (NUMBER_NODES < 2) {
             System.out.println("Cannot create a network containing less than 2 nodes.");
@@ -55,6 +57,13 @@ class GraphGenerator {
         }
     }
 
+    static public FireflyData newFireflyComponent() {
+        float clockTime = random.nextFloat() * 50f;
+        float currentTime = random.nextFloat() * clockTime;
+
+        return new FireflyData(clockTime, currentTime, false);
+    }
+
     static void createNode(Node node, List<EntityId> edges) {
         EntityId entityId = new EntityId(node.id);
 
@@ -62,10 +71,13 @@ class GraphGenerator {
         entity.add(Position.class, new PositionData(new Coordinates(node.x, node.y, node.z)));
         entity.add(Links.class, new LinksData(edges));
 
+        entity.add(Firefly.class, newFireflyComponent());
+
         entity.add(Visualise.class, new VisualiseData());
 
         int[] writeList = {
-                Position.COMPONENT_ID
+                Position.COMPONENT_ID,
+                Firefly.COMPONENT_ID
         };
 
         entity.add(EntityAcl.class, createAcl(ENGINE_ATTRIBUTE_NAME, writeList));

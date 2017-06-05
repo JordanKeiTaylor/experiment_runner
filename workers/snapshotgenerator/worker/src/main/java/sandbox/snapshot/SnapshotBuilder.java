@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
 
@@ -24,19 +25,30 @@ public class SnapshotBuilder extends HashMap<EntityId, SnapshotEntity> {
 
     private long nextId = 200;
 
+    private Random random = new Random();
+
     public void createSubscriber(Coordinates position) {
         EntityId entityId = new EntityId(this.nextId++);
 
         SnapshotEntity entity = new SnapshotEntity("subscriber");
         entity.add(Position.class, new PositionData(position));
         entity.add(Visualise.class, new VisualiseData());
+        entity.add(Firefly.class, newFireflyComponent());
 
         int[] writeList = {
-                Position.COMPONENT_ID
+                Position.COMPONENT_ID,
+                Firefly.COMPONENT_ID
         };
 
         entity.add(EntityAcl.class, createAcl(ENGINE_ATTRIBUTE_NAME, writeList));
         this.put(entityId, entity);
+    }
+
+    public FireflyData newFireflyComponent() {
+        float clockTime = random.nextFloat() * 100f;
+        float currentTime = random.nextFloat() * clockTime;
+
+        return new FireflyData(clockTime, currentTime, false);
     }
 
     public void createProvider(Coordinates position) {

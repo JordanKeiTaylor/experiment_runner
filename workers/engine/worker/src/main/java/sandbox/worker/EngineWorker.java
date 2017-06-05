@@ -24,6 +24,8 @@ public class EngineWorker {
     private static final Logger logger = new Logger();
     private static RequestId<EntityQueryRequest> statsRequestId;
 
+    private static HashMap<EntityId, FireflyModel> fireflies = new HashMap<EntityId, FireflyModel>();
+
     public static void startWorker(String[] args) {
         initializeWorker(args);
         
@@ -44,9 +46,9 @@ public class EngineWorker {
                 while (updates > 0) {
                     updates--;
                     lastStep += TIMESTEP;
-                    //physics.applyPhysics(PHYSICS_DELTA);
+                    updateFireflies(DELTA);
                 }
-                //physics.sendUpdates(connection);
+                sendUpdates(connection);
             }
 
             end = System.currentTimeMillis();
@@ -117,6 +119,11 @@ public class EngineWorker {
         dispatcher.onComponentUpdate(Position.class, EngineWorker::updateParticle);
         dispatcher.onRemoveComponent(Position.class, EngineWorker::removeParticle);
 
+        dispatcher.onAuthorityChange(Firefly.class, EngineWorker::authorityChange);
+        dispatcher.onAddComponent(Firefly.class, EngineWorker::addFirefly);
+        dispatcher.onComponentUpdate(Firefly.class, EngineWorker::updateFirefly);
+        dispatcher.onRemoveComponent(Firefly.class, EngineWorker::removeFirefly);
+
         return dispatcher;
     }
 
@@ -130,7 +137,17 @@ public class EngineWorker {
     }
 
     private static void removeParticle(RemoveComponent op) {
-    }    
+    }
+
+    private static void addFirefly(AddComponent<FireflyData, Firefly> op) {
+        fireflies.put(op.entityId, new FireflyModel(op));
+    }
+
+    private static void updateFirefly(Ops.ComponentUpdate<Firefly.Update> op) {
+    }
+
+    private static void removeFirefly(RemoveComponent op) {
+    }
 
     private static void sendMetricsUpdate(Ops.Metrics metricsOp) {
         Metrics metrics = metricsOp.metrics;
@@ -138,6 +155,19 @@ public class EngineWorker {
         connection.sendMetrics(metrics);
     }
 
+    private static void updateFireflies(float delta) {
+        for (FireflyModel firefly : fireflies.values()) {
+            firefly.update(delta);
+        }
+    }
+
+    private static void sendUpdates(Connection connection) {
+        for (FireflyModel firefly : fireflies.values()) {
+            if (firefly.shouldUpdateSpatial) {
+                firefly.sendUpdate(connection);
+            }
+        }
+    }
 
     private static void processOpList() {
         try (OpList opList = connection.getOpList(0)) {
@@ -145,5 +175,59 @@ public class EngineWorker {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+    }
+}
+
+class FireflyModel {
+    final float clockTime;
+    float currentTime;
+    boolean illuminated;
+    float currentIlluminationDuration;
+    float illuminationTimeout = 20f;
+    EntityId entityId;
+
+    public boolean shouldUpdateSpatial = false;
+
+    public FireflyModel(AddComponent<FireflyData, Firefly> op) {
+        entityId = op.entityId;
+
+        clockTime = op.data.getClockTime();
+        illuminated = op.data.getIlluminated();
+        currentTime = op.data.getCurrentTime();
+        currentIlluminationDuration = 0;
+    }
+
+    public void update(float delta) {
+        currentTime += delta;
+
+        shouldUpdateSpatial = true;
+
+        if (illuminated) {
+            currentIlluminationDuration += delta;
+        }
+
+        if (currentTime > clockTime) {
+            illuminated = true;
+            shouldUpdateSpatial = true;
+
+            currentTime %= clockTime;
+        } else {
+            if (currentIlluminationDuration > illuminationTimeout) {
+                illuminated = false;
+                currentIlluminationDuration = 0;
+                shouldUpdateSpatial = true;
+            }
+        }
+    }
+
+    public void sendUpdate(Connection connection) {
+        Firefly.Update update = new Firefly.Update();
+
+        update.setIlluminated(illuminated);
+        update.setCurrentTime(currentTime);
+
+        connection.sendComponentUpdate(this.entityId, update);
+
+        shouldUpdateSpatial = false;
     }
 }
