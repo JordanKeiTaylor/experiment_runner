@@ -47,7 +47,7 @@ let canvasOffset = {
 }
 
 let SCALE_REFRESH = 1000;
-let MAX_FPS = 10;
+let MAX_FPS = 33;
 let renderTimeout = null;
 let scaleRefreshTimeout = null;
 
@@ -103,6 +103,7 @@ addComponentState = (componentKey, op) => {
 updateComponentState = (componentKey, op) => {
     window.entities[op.entityId] = window.entities[op.entityId] || { id: op.entityId };
     
+    //todo: generify
     window.entities[op.entityId][componentKey].illuminated = op.update.illuminated.value;
 
     render();

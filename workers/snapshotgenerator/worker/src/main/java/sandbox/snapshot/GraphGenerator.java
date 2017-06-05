@@ -58,7 +58,7 @@ class GraphGenerator {
     }
 
     static public FireflyData newFireflyComponent() {
-        float clockTime = random.nextFloat() * 50f;
+        float clockTime = (random.nextFloat() * 50f) + 20f;
         float currentTime = random.nextFloat() * clockTime;
 
         return new FireflyData(clockTime, currentTime, false);

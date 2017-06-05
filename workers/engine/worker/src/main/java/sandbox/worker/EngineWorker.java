@@ -183,7 +183,7 @@ class FireflyModel {
     float currentTime;
     boolean illuminated;
     float currentIlluminationDuration;
-    float illuminationTimeout = 20f;
+    float illuminationTimeout = 10f;
     EntityId entityId;
 
     public boolean shouldUpdateSpatial = false;
