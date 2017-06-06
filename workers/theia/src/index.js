@@ -1,11 +1,11 @@
 const sdk = require("spatialos_worker_sdk");
 
-let position = require('./generated/sandbox/Position.js').Position;
-let visualise = require('./generated/sandbox/Visualise.js').Visualise;
-let entityacl = require('./generated/improbable/EntityAcl.js').EntityAcl;
+import { Position as position } from './generated/sandbox/Position.js';
+import { Visualise as visualise } from './generated/sandbox/Visualise.js';
+import { EntityAcl as entityacl } from './generated/improbable/EntityAcl.js';
 
-let links = require('./generated/sandbox/Links.js').Links;
-let firefly = require('./generated/sandbox/Firefly.js').Firefly;
+import { Links as links } from './generated/sandbox/Links.js';
+import { Firefly as firefly } from './generated/sandbox/Firefly.js';
 
 // specify what you want to observe
 let listenItems = [
@@ -36,7 +36,7 @@ window.positions = [];
 let canvas;
 let ctx;
 
-const FIX_PERSPECTIVE = true;
+const FIX_PERSPECTIVE = false;
 let canvasScale = {
     x: 1,
     y: 1
@@ -93,14 +93,14 @@ locator.getDeploymentList((err, deploymentList) => {
     });
 });
 
-addComponentState = (componentKey, op) => {
+let addComponentState = (componentKey, op) => {
     window.entities[op.entityId] = window.entities[op.entityId] || { id: op.entityId };
     window.entities[op.entityId][componentKey] = op.data;
 
     render();
 }
 
-updateComponentState = (componentKey, op) => {
+let updateComponentState = (componentKey, op) => {
     window.entities[op.entityId] = window.entities[op.entityId] || { id: op.entityId };
     
     //todo: generify
@@ -109,7 +109,7 @@ updateComponentState = (componentKey, op) => {
     render();
 }
 
-render = () => {
+let render = () => {
     // console.log("Requesting render");
     if (!renderTimeout) {
         // console.log("Setting render callback");
@@ -124,7 +124,7 @@ render = () => {
     }
 };
 
-renderAllEntities = (entities) => {
+let renderAllEntities = (entities) => {
     for (let id in entities) {
         if (entities[id]) {
             renderSingleEntity(entities[id])
@@ -132,7 +132,7 @@ renderAllEntities = (entities) => {
     }
 }
 
-renderSingleEntity = (entity) => {
+let renderSingleEntity = (entity) => {
     let position = entity.position;
 
     if (position) {
@@ -158,11 +158,11 @@ renderSingleEntity = (entity) => {
     }
 }
 
-getWorldX = x => (x * canvasScale.x) + (canvasOffset.x * canvasScale.x);
+let getWorldX = x => (x * canvasScale.x) + (canvasOffset.x * canvasScale.x);
 
-getWorldY = y => (y * canvasScale.y) + (canvasOffset.y * canvasScale.y);
+let getWorldY = y => (y * canvasScale.y) + (canvasOffset.y * canvasScale.y);
 
-drawEntityReference = (entity1, entity2) => {
+let drawEntityReference = (entity1, entity2) => {
     if (entity1 && entity1.position && entity2 && entity2.position) {
         ctx.strokeStyle = "#FFF";
         ctx.lineWidth = 3;
@@ -173,7 +173,7 @@ drawEntityReference = (entity1, entity2) => {
     }
 }
 
-initialisePage = () => {
+let initialisePage = () => {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
 
@@ -186,7 +186,7 @@ initialisePage = () => {
     renderLoading();
 };
 
-setScale = () => {
+let setScale = () => {
     if (!scaleRefreshTimeout) {
         scaleRefreshTimeout = null;
         console.log("Resetting scale");
@@ -229,13 +229,13 @@ setScale = () => {
     }
 }
 
-renderBackground = () => {
+let renderBackground = () => {
     ctx.globalAlpha = 1;
     ctx.fillStyle = "#1C1F22";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-renderLoading = () => {
+let renderLoading = () => {
     ctx.globalAlpha = 1;
     ctx.fillStyle = "#FFF";
     ctx.font = 'lighter 20px sans-serif';

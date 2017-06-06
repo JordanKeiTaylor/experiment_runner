@@ -1,7 +1,6 @@
 {
   "build": {
-    "tasks_filename": "spatialos.javascript.build.json",
-    "generated_build_scripts_type": "javascript"
+    "tasks_filename": "spatialos.javascript.build.custom.json"
   },
   "bridge": {
     "worker_attribute_set": {
