@@ -9,6 +9,9 @@ import improbable.worker.Ops.RemoveComponent;
 
 import sandbox.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +28,7 @@ public class EngineWorker {
     private static RequestId<EntityQueryRequest> statsRequestId;
 
     private static HashMap<EntityId, FireflyModel> fireflies = new HashMap<EntityId, FireflyModel>();
+    private static HashMap<EntityId, LinksModel> links = new HashMap<EntityId, LinksModel>();
 
     public static void startWorker(String[] args) {
         initializeWorker(args);
@@ -114,33 +118,54 @@ public class EngineWorker {
         dispatcher.onDisconnect(disconnect -> System.exit(0));
         dispatcher.onMetrics(EngineWorker::sendMetricsUpdate);
 
-        dispatcher.onAuthorityChange(Position.class, EngineWorker::authorityChange);
-        dispatcher.onAddComponent(Position.class, EngineWorker::addParticle);
-        dispatcher.onComponentUpdate(Position.class, EngineWorker::updateParticle);
-        dispatcher.onRemoveComponent(Position.class, EngineWorker::removeParticle);
-
         dispatcher.onAuthorityChange(Firefly.class, EngineWorker::authorityChange);
         dispatcher.onAddComponent(Firefly.class, EngineWorker::addFirefly);
         dispatcher.onComponentUpdate(Firefly.class, EngineWorker::updateFirefly);
         dispatcher.onRemoveComponent(Firefly.class, EngineWorker::removeFirefly);
 
+        dispatcher.onAuthorityChange(Links.class, EngineWorker::authorityChange);
+        dispatcher.onAddComponent(Links.class, EngineWorker::addLinks);
+        dispatcher.onComponentUpdate(Links.class, EngineWorker::updateLinks);
+        dispatcher.onRemoveComponent(Links.class, EngineWorker::removeLinks);
+
         return dispatcher;
+    }
+
+    private static void addLinkstoFirefly(LinksModel links, FireflyModel firefly) {
+        links.links.stream().forEach(id -> firefly.addNeighbour(id));
     }
 
     private static void authorityChange(AuthorityChange op) {
     }
 
-    private static void addParticle(AddComponent<PositionData, Position> op) {
+    private static void addLinks(AddComponent<LinksData, Links> op) {
+        LinksModel neighbours = new LinksModel(op);
+
+        //if firefly exists then add the links
+        FireflyModel firefly = fireflies.get(op.entityId);
+        if (firefly != null) {
+            addLinkstoFirefly(neighbours, firefly);
+        }
+
+        links.put(op.entityId, neighbours);
     }
 
-    private static void updateParticle(Ops.ComponentUpdate<Position.Update> op) {
+    private static void updateLinks(Ops.ComponentUpdate<Links.Update> op) {
     }
 
-    private static void removeParticle(RemoveComponent op) {
+    private static void removeLinks(RemoveComponent op) {
     }
 
     private static void addFirefly(AddComponent<FireflyData, Firefly> op) {
-        fireflies.put(op.entityId, new FireflyModel(op));
+        FireflyModel firefly = new FireflyModel(op);
+
+        //add links to firefly if they already exist
+        LinksModel neighbours = links.get(op.entityId);
+        if (neighbours != null) {
+            addLinkstoFirefly(neighbours, firefly);
+        }
+
+        fireflies.put(op.entityId, firefly);
     }
 
     private static void updateFirefly(Ops.ComponentUpdate<Firefly.Update> op) {
@@ -178,6 +203,14 @@ public class EngineWorker {
     }
 }
 
+class LinksModel {
+    List<EntityId> links;
+
+    public LinksModel(AddComponent<LinksData, Links> op) {
+        links = op.data.getIds();
+    }
+}
+
 class FireflyModel {
     final float clockTime;
     float currentTime;
@@ -185,6 +218,7 @@ class FireflyModel {
     float currentIlluminationDuration;
     float illuminationTimeout = 10f;
     EntityId entityId;
+    List<EntityId> neighbours = new ArrayList<EntityId>();
 
     public boolean shouldUpdateSpatial = false;
 
@@ -195,6 +229,10 @@ class FireflyModel {
         illuminated = op.data.getIlluminated();
         currentTime = op.data.getCurrentTime();
         currentIlluminationDuration = 0;
+    }
+
+    public void addNeighbour(EntityId id) {
+        neighbours.add(id);
     }
 
     public void update(float delta) {
