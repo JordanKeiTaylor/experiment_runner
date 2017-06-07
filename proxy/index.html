@@ -15,7 +15,7 @@
       color: #fff;
       font-family: 'Roboto Mono', monospace;
       overflow: scroll;
-      padding: 0px 20px;
+      padding: 20px;
       font-size: 12px;
     }
 
@@ -37,19 +37,32 @@
         document.getElementById('theia').src = 'http://localhost:21000/worker/theia'
     }
 
-    startSpatial = () => {
-        var socket = io();
+    connectConsole = () => {
+        window.socket = io();
+        $('#console').append("<b>Connecting to hermes...</b><br />");
+
+        socket.on('connect', () => {
+            $('#console').append("<b>Successfully connected!</b><br />");
+            $('#console').append("=========================<br />");
+        })
+
         socket.on('console dump', data => {
-            console.log("recieved emit")
             console.log(data)
-            $('#console').append(data + "<br />");
+            $('#console').append(data.msg + "<br /><br />");
         });
     }
+
+    startSpatial = () => {
+        socket.emit('request launch', {});
+    }
+
+    $( document ).ready(() => {
+        connectConsole();
+    });
   </script>
 </head>
 <body>
   <div id="console">
-    Console <br />
   </div>
   <div>
     <button onclick="startSpatial()">Start simulation</button>
