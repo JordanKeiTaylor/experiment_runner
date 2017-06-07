@@ -48,12 +48,16 @@
 
         socket.on('console dump', data => {
             console.log(data)
-            $('#console').append(data.msg + "<br /><br />");
+            $('#console').append(data + "<br /><br />");
         });
     }
 
     startSpatial = () => {
         socket.emit('request launch', {});
+    }
+
+    killSpatial = () => {
+        socket.emit('request kill', {})
     }
 
     $( document ).ready(() => {
@@ -65,7 +69,8 @@
   <div id="console">
   </div>
   <div>
-    <button onclick="startSpatial()">Start simulation</button>
+    <button onclick="startSpatial()">Start</button>
+    <button onclick="killSpatial()">Kill</button>
     <button onclick="loadTheia()">Load visualisation</button>
   </div>
   <iframe id="theia">
