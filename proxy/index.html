@@ -1,0 +1,61 @@
+<html>
+<head>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background-color: #272822;
+    }
+
+    #console {
+      float: left;
+      width: 40%;
+      background-color: #000;
+      height: 100%;
+      color: #fff;
+      font-family: 'Roboto Mono', monospace;
+      overflow: scroll;
+      padding: 0px 20px;
+      font-size: 12px;
+    }
+
+    #console::selection {
+      background: hotpink;
+    }
+
+    #theia {
+      width: 600px;
+      height: 400px;
+      border: none;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300" rel="stylesheet">
+  <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+  <script type="application/javascript">
+    loadTheia = () => {
+        document.getElementById('theia').src = 'http://localhost:21000/worker/theia'
+    }
+
+    startSpatial = () => {
+        var socket = io();
+        socket.on('console dump', data => {
+            console.log("recieved emit")
+            console.log(data)
+            $('#console').append(data + "<br />");
+        });
+    }
+  </script>
+</head>
+<body>
+  <div id="console">
+    Console <br />
+  </div>
+  <div>
+    <button onclick="startSpatial()">Start simulation</button>
+    <button onclick="loadTheia()">Load visualisation</button>
+  </div>
+  <iframe id="theia">
+  </iframe>
+</body>
+</html>
