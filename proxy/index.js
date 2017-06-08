@@ -3,8 +3,12 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var child = require('child_process');
 var process = require('process');
+const uuidV4 = require('uuid/v4');
 
 let spatial = null;
+const uuid = uuidV4();
+
+console.log(`Starting Hermes instance: ${uuid}`)
 
 app.get('/*', function(req, res){
     res.sendFile(__dirname + '/index.html');
@@ -12,6 +16,8 @@ app.get('/*', function(req, res){
 
 io.on('connection', function(socket){
     console.log('Client connected');
+
+    socket.emit('console dump', `Hermes instance: ${uuid}`);
 
     socket.on('request launch', () => requestLaunchSpatial(socket));
 
