@@ -1,31 +1,55 @@
 <html>
 <head>
   <style>
+    html, body {
+      /* disable scrolling */
+      overflow: hidden;
+      height: 100%;
+    }
+
     body {
       padding: 0;
       margin: 0;
-      background-color: #272822;
+      background-color: #1C1F22;
+    }
+
+    #console-frame {
+      float: left;
+      width: 40%;
+      height: 100%;
     }
 
     #console {
-      float: left;
-      width: 40%;
       background-color: #000;
-      height: 100%;
       color: #fff;
       font-family: 'Roboto Mono', monospace;
       overflow: scroll;
-      padding: 20px;
       font-size: 12px;
+      padding: 20px;
+      height: inherit;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
     }
 
     #console::selection {
       background: hotpink;
     }
 
+    #theia-frame {
+      float: right;
+      width: 60%;
+    }
+
+    #toolbar {
+      position: fixed;
+      top:0;
+      right:0;
+    }
+
     #theia {
-      width: 600px;
-      height: 400px;
+      width: 100%;
+      height: 100%;
       border: none;
     }
   </style>
@@ -65,14 +89,18 @@
   </script>
 </head>
 <body>
-  <div id="console">
+  <div id="console-frame">
+    <div id="console">
+    </div>
   </div>
-  <div>
+  <div id="theia-frame">
+    <iframe id="theia">
+    </iframe>
+  </div>
+  <div id="toolbar">
     <button onclick="startSpatial()">Start</button>
     <button onclick="killSpatial()">Kill</button>
     <button onclick="loadTheia()">Load visualisation</button>
   </div>
-  <iframe id="theia">
-  </iframe>
 </body>
 </html>
