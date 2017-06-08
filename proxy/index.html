@@ -13,49 +13,66 @@
       background-color: #1C1F22;
     }
 
+    #view {
+      height: 100%;
+      width: 100%;
+    }
+
     #console-frame {
+      height: 100%;
+      background-color: #000;
+
       float: left;
       width: 40%;
-      height: 100%;
     }
 
     #console {
-      background-color: #000;
       color: #fff;
       font-family: 'Roboto Mono', monospace;
-      overflow: scroll;
       font-size: 12px;
-      padding: 20px;
-      height: inherit;
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
+      padding: 5% 20px 0 20px;
+
+      height: 95%;
+      overflow: scroll;
     }
 
     #console::selection {
       background: hotpink;
     }
 
-    #theia-frame {
-      float: right;
-      width: 60%;
+    #toolbar {
+      position: relative;
+      top:0;
+      left:0;
+      right:0;
+      padding: 10px;
+      background: #3C3F41;
+      border-bottom: 5px #3B3A32 solid;
     }
 
-    #toolbar {
-      position: fixed;
-      top:0;
-      right:0;
+    .scenario-name {
+      margin: 0px 20px;
+
+      font-size: 16px;
+      color: white;
     }
 
     #theia {
       width: 100%;
-      height: 100%;
       border: none;
+      height: 100%;
+    }
+
+    #theia-frame {
+      float: right;
+      width: 60%;
+      height: 100%;
     }
   </style>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300" rel="stylesheet">
   <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <script type="application/javascript">
     loadTheia = () => {
         document.getElementById('theia').src = 'http://localhost:21000/worker/theia'
@@ -89,18 +106,23 @@
   </script>
 </head>
 <body>
-  <div id="console-frame">
-    <div id="console">
-    </div>
-  </div>
-  <div id="theia-frame">
-    <iframe id="theia">
-    </iframe>
-  </div>
+
   <div id="toolbar">
-    <button onclick="startSpatial()">Start</button>
-    <button onclick="killSpatial()">Kill</button>
-    <button onclick="loadTheia()">Load visualisation</button>
+    <span class="scenario-name">Scenario #1</span>
+    <button onclick="startSpatial()" class="btn btn-outline-secondary">Start</button>
+    <button onclick="killSpatial()" class="btn btn-outline-danger">Kill</button>
+    <button onclick="loadTheia()" class="btn btn-outline-secondary">Load visualisation</button>
+  </div>
+  <div id="view">
+    <div id="console-frame">
+      <div id="console">
+        <br /><br /><br />
+      </div>
+    </div>
+    <div id="theia-frame">
+      <iframe id="theia">
+      </iframe>
+    </div>
   </div>
 </body>
 </html>
