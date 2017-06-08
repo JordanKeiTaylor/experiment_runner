@@ -35,7 +35,7 @@
   <script type="application/javascript">
     loadTheia = () => {
         document.getElementById('theia').src = 'http://localhost:21000/worker/theia'
-    }
+    };
 
     connectConsole = () => {
         window.socket = io();
@@ -47,20 +47,19 @@
         })
 
         socket.on('console dump', data => {
-            console.log(data)
             $('#console').append(data + "<br /><br />");
         });
-    }
+    };
 
     startSpatial = () => {
         socket.emit('request launch', {});
-    }
+    };
 
     killSpatial = () => {
         socket.emit('request kill', {})
-    }
+    };
 
-    $( document ).ready(() => {
+    $(document).ready(() => {
         connectConsole();
     });
   </script>

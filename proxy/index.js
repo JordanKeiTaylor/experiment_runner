@@ -11,7 +11,7 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log('Client connected');
 
     socket.on('request launch', () => requestLaunchSpatial(socket));
 
@@ -28,7 +28,7 @@ function requestLaunchSpatial(socket) {
     if (!spatial) {
         launchSpatial(socket);
     } else {
-        socket.emit('console dump', "[ERROR] Spatial already running!");
+        socket.emit('console dump', "[ERROR] Spatial already running");
     }
 }
 
