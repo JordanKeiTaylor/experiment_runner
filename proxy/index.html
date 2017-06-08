@@ -79,7 +79,12 @@
     };
 
     connectConsole = () => {
-        window.socket = io();
+        let url = "localhost:3000" //default
+        if (window.location.pathname) {
+            url = window.location.pathname.slice(1);
+        }
+
+        window.socket = io(url);
         $('#console').append("<b>Connecting to hermes...</b><br />");
 
         socket.on('connect', () => {
