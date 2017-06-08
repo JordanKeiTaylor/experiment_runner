@@ -85,11 +85,11 @@
         }
 
         window.socket = io(url);
-        $('#console').append("<b>Connecting to hermes...</b><br />");
+        print("<b>Connecting to hermes...</b><br />");
 
         socket.on('connect', () => {
-            $('#console').append("<b>Successfully connected!</b><br />");
-            $('#console').append("=========================<br />");
+            print("<b>Successfully connected!</b><br />");
+            print("=========================<br />");
         })
 
         socket.on('console dump', data => {
@@ -103,6 +103,10 @@
 
     killSpatial = () => {
         socket.emit('request kill', {})
+    };
+
+    print = (message) => {
+        $('#console').append(message);
     };
 
     $(document).ready(() => {
