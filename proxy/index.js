@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var child = require('child_process');
+var process = require('process');
 
 let spatial = null;
 
@@ -14,7 +15,11 @@ io.on('connection', function(socket){
 
     socket.on('request launch', () => requestLaunchSpatial(socket));
 
-    socket.on('request kill', () => killSpatial(socket));
+    socket.on('request kill', () => requestKillSpatial(socket));
+});
+
+http.listen(3000, function(){
+    console.log('listening on *:3000');
 });
 
 function requestLaunchSpatial(socket) {
@@ -28,7 +33,7 @@ function requestLaunchSpatial(socket) {
 }
 
 function launchSpatial(socket) {
-    spatial = child.spawn('bash', ['startspatial'], []);
+    spatial = child.spawn('bash', ['startspatial'], {detached: true});
 
     spatial.stdout.on('data', data => {
         console.log(data.toString());
@@ -40,20 +45,33 @@ function launchSpatial(socket) {
     })
 
     spatial.on('close', (code, signal) => {
-        socket.emit('console dump', "Spatial died/killed (rip)!");
-        console.log(`child process terminated due to receipt of signal ${signal}`);
+        socket.emit('console dump', "Spatial died/killed (rip)");
+        console.log(`Spatial terminated due to receipt of signal ${signal}`);
     });
 }
 
-function killSpatial(socket) {
+function requestKillSpatial(socket) {
+    socket.emit('console dump', "Attempting spatial kill...");
+
     if (spatial) {
-        socket.emit('console dump', "Attempting spatial kill...");
-        spatial.kill('QUIT');
+        killSpatial();
     } else {
         socket.emit('console dump', " [ERROR] Cannot kill spatial. Is it running?");
     }
 }
 
-http.listen(3000, function(){
-    console.log('listening on *:3000');
-});
+function killSpatial() {
+    if (spatial) {
+        process.kill(-spatial.pid, 'SIGINT');
+        spatial = null;
+    }
+}
+
+function exit() {
+    killSpatial();
+    process.exit();
+}
+
+process.on('exit', exit);
+process.on('SIGINT',exit);
+process.on('uncaughtException', exit);
