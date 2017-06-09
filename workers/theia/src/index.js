@@ -231,7 +231,7 @@ let setScale = () => {
 
 let renderBackground = () => {
     ctx.globalAlpha = 1;
-    ctx.fillStyle = "#1C1F22";
+    ctx.fillStyle = "#2F3129";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 

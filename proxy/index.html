@@ -22,8 +22,10 @@
       height: 100%;
       background-color: #000;
 
-      float: left;
+      float: right;
       width: 40%;
+
+      border-left: 5px #3B3A32 solid;
     }
 
     #console {
@@ -46,7 +48,7 @@
       left:0;
       right:0;
       padding: 10px;
-      background: #3C3F41;
+      background: #272822;
       border-bottom: 5px #3B3A32 solid;
     }
 
@@ -65,17 +67,34 @@
     }
 
     #theia-frame {
-      float: right;
+      float: left;
       width: 60%;
+      height: 60%;
+      background-color: #2F3129;
+    }
+
+    #input-frame {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60%;
+      height: 35%;
+
+      border-top: 5px #3B3A32 solid;
+    }
+
+    #editor {
+      width: 100%;
       height: 100%;
-      background-color: #1C1F22;
     }
   </style>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300" rel="stylesheet">
   <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"></script>
   <script type="application/javascript">
+
     loadTheia = () => {
         document.getElementById('theia').style.display = 'block';
         document.getElementById('theia').src = 'http://localhost:21000/worker/theia'
@@ -115,6 +134,9 @@
     print = message => $('#console').append(message);
 
     $(document).ready(() => {
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/json");
         connectConsole();
     });
   </script>
@@ -128,13 +150,17 @@
     <a href="https://ifttt.com/applets/55532059d-start-simulation-if-incident-occurs" class="btn btn-outline-warning">Open Webhook</a>
   </div>
   <div id="view">
-    <div id="console-frame">
-      <div id="console">
-      </div>
-    </div>
     <div id="theia-frame">
       <iframe id="theia">
       </iframe>
+    </div>
+    <div id="input-frame">
+      <div id="editor"></div>
+    </div>
+
+    <div id="console-frame">
+      <div id="console">
+      </div>
     </div>
   </div>
 </body>
