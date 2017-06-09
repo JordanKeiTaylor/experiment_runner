@@ -8,7 +8,13 @@ const uuidV4 = require('uuid/v4');
 let spatial = null;
 const uuid = uuidV4();
 
-console.log(`Starting Hermes instance: ${uuid}`)
+console.log(`Starting Hermes instance: ${uuid}`);
+
+app.get('/start', function(req, res, next) {
+    res.send();
+    console.log("Starting simulation");
+    console.log(req.query);
+});
 
 app.get('/*', function(req, res){
     res.sendFile(__dirname + '/index.html');
