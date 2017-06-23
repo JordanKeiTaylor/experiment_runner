@@ -33,6 +33,10 @@
           }
         ],
         "flags": [
+          {
+            "name": "sim_name",
+            "value": "sim1"
+          }
         ],
         "load_balancing": {
           "static_hex_grid": {

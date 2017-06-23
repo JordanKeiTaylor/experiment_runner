@@ -1,0 +1,130 @@
+<html>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var ws = io();
+    var simulations = {};
+    var current_x = 1;
+    var x_axis = [];
+    var flagNames;
+    
+    window.onload = function(){
+        console.log("Requesting")
+        ws.emit("requestFlags",{});
+    }
+
+    var attachgraph = function(simname){
+    	var graph_for_sim = $("<div id= '" + simname + "''style ='width: 400px; height: 400px;'>")
+    	var label = $("<h1>"+ simname + "</h1>")
+    	$('body').append(label)
+    	$('body').append(graph_for_sim)
+    }
+
+    ws.on("sendFlags",function(data){
+        flagNames = JSON.parse(data)
+        console.log(data)
+        describeFlags(flagNames)
+    })
+
+    function describeFlags(flagNames){
+        $("body").append($("<p> Your simulation has the following flags. Click Add Simulation to add an instance with specific flag values. Start simulation starts your simulations. If you make changes to your simulation and run spatial build, delete the package.box file in your directory manually. Otherwise changes wont be reflected in your VMs</p>"))
+        var flaglist = "<p> Flags:"
+        for(var i =0; i<flagNames.length;i++){
+           flaglist = flaglist + " " + flagNames[i];
+        }
+        $('body').append(flaglist)
+        $('body').append('<button onclick="addSimulation(flagNames)" >Add simulation</button>')
+        $('body').append('<button onclick="submitAll()">Start simulations</button>')
+        $('body').append(
+            '<form method = "post" action = "http://localhost:3000/createSim" id = "simForm" > <input hidden type="submit" id= "submitSims" value = "Submit"></form>'
+        )
+    }
+
+
+
+		
+    var onmessage = function (data) 
+    { 
+    	current_x++;
+    	x_axis.push(current_x);
+        data = JSON.parse(data);
+        simulation = data.simulation;
+      	var historical_data = simulations[simulation];
+      	
+
+        if(historical_data === undefined){
+        	simulations[simulation] = {};
+        	historical_data = simulations[simulation];
+        	attachgraph(simulation);
+        	for(var key in data){
+        		if(key !== "simulation"){
+        			historical_data[key] = [data[key]];
+        		}
+        	}
+        } else {
+        	for(var key in data){
+        		if(key !== "simulation"){
+	        		historical_data[key].push(data[key]);
+	        		if(historical_data[key].length > 4){
+	        			historical_data[key].shift();
+	        		}
+	        	}
+        	}
+        }
+        console.log(historical_data)
+
+        if(x_axis.length>4){
+        	x_axis.shift();
+        }
+
+
+        var variables = [];
+
+        for(var variable in historical_data){
+        	var graph_data = {};
+        	graph_data.x = x_axis;
+        	graph_data.type = "scatter";
+        	graph_data.name = variable;
+        	graph_data["y"] = historical_data[variable]
+        	variables.push(graph_data);
+        }
+
+        
+        console.log(variables);
+
+
+        Plotly.newPlot(simulation, variables);
+    };
+		
+    ws.on("message",onmessage)
+</script>
+<script>
+    var num_sims = 0;
+
+    function addSimulation(flags){
+        var simForm = $('#simForm')
+        var form_div = $("<div style = 'border:1px solid black'></div>")
+        for(var i = 0; i<flags.length;i++){
+            console.log(flags[i])
+            var label = $("<span>"+ flags[i] + "</span>")
+            var input = $('<input type="text" name=' + "sim" + num_sims + ":" +  flags[i] + '><br>')
+            form_div.append(label);
+            form_div.append(input);
+            form_div.append($('<br></br>'))
+        }
+
+        simForm.append(form_div);
+        num_sims++;
+    }
+
+    function submitAll(){
+        document.getElementById("submitSims").click();
+    }
+
+</script>
+<body>
+</body>
+
+</html>

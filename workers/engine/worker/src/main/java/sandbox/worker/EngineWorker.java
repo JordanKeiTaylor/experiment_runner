@@ -15,6 +15,24 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.apache.http.*;
+import org.apache.http.client.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.client.params.*;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+
 public class EngineWorker {
 
     private static final long TIMESTEP = 10; // 100 frames a second
@@ -26,6 +44,7 @@ public class EngineWorker {
     private static double load;
     private static final Logger logger = new Logger();
     private static RequestId<EntityQueryRequest> statsRequestId;
+    private static long numIlluminated = 0;
 
     private static HashMap<EntityId, FireflyModel> fireflies = new HashMap<EntityId, FireflyModel>();
     private static HashMap<EntityId, LinksModel> links = new HashMap<EntityId, LinksModel>();
@@ -38,6 +57,7 @@ public class EngineWorker {
         long start;
         long end;
         long lastStep = System.currentTimeMillis();
+        long lastDataSent = System.currentTimeMillis();
         long elapsedMillis;
         while (true) {
             start = System.currentTimeMillis();
@@ -51,6 +71,12 @@ public class EngineWorker {
                     updates--;
                     lastStep += TIMESTEP;
                     updateFireflies(DELTA);
+                    if((System.currentTimeMillis() - lastDataSent) > 1000){
+                        lastDataSent = System.currentTimeMillis();
+                        //sendData();
+                        sendData2(numIlluminated);
+                    }
+                    
                 }
                 sendUpdates(connection);
             }
@@ -64,6 +90,38 @@ public class EngineWorker {
             } catch (InterruptedException ignored) {
 
             }
+        }
+    }
+
+    private static void sendData(){
+        try {
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpGet httpget = new HttpGet("http://10.0.2.2:3000");
+            CloseableHttpResponse response = httpclient.execute(httpget);
+        } catch(Exception e){
+            System.out.println(e);
+        } finally {
+
+        }
+    }
+
+    private static void sendData2(long numIlluminated){
+        try {
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpPost httpPost = new HttpPost("http://10.0.2.2:3000/senddata");
+            List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+            nvps.add(new BasicNameValuePair("simulation", "sim2"));
+            nvps.add(new BasicNameValuePair("Illuminated", String.valueOf(numIlluminated)));
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+            CloseableHttpResponse response2 = httpclient.execute(httpPost);
+            System.out.println(response2.getStatusLine());
+            HttpEntity entity2 = response2.getEntity();
+            // do something useful with the response body
+            // and ensure it is fully consumed
+            EntityUtils.consume(entity2);
+            response2.close();
+        } catch(Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -181,9 +239,16 @@ public class EngineWorker {
     }
 
     private static void updateFireflies(float delta) {
+        long currently_illuminated = 0;
         for (FireflyModel firefly : fireflies.values()) {
             firefly.update(delta);
+            if(firefly.illuminated == true){
+                currently_illuminated ++;
+            }
         }
+
+        numIlluminated = currently_illuminated;
+
     }
 
     private static void sendUpdates(Connection connection) {
